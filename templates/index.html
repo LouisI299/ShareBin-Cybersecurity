@@ -5,12 +5,40 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100">
+    <header>
+      <nav class="bg-blue-500 p-4 flex flex-row text-white">
+        <div class="container mx-auto">
+          <a href="/">
+            <h1 class="text-white text-2xl">ShareBin</h1>
+          </a>
+        </div>
+        <div class="container mx-auto justify-center text-2xl">
+          <a href="/notes" class="text-white p-2">Notes</a>
+          <a href="/about" class="text-white p-2">About</a>
+          <a href="/contact" class="text-white p-2">Contact</a>
+        </div>
+        <div class="container mx-auto flex justify-end text-2xl">
+          {% if user %}
+          <a href="/">{{ user }}</a>
+          {% else %}
+          <a href="/login">Login</a> | <a href="/register">Register</a>
+          {% endif %}
+        </div>
+      </nav>
+    </header>
     <h1>Welcome to ShareBin</h1>
     {% if user %}
-    <p>Logged in as {{ user }}</p>
-    <a href="/logout">Logout</a>
-    {% else %}
-    <a href="/login">Login</a> | <a href="/register">Register</a>
-    {% endif %}
+    <a href="/note/new" class="text-blue-500 hover:underline"
+      >Create New Note</a
+    >
+    {% for note in notes %}
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
+      <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+      <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
+      <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+        >View Note</a
+      >
+    </div>
+    {% endfor %} {% endif %}
   </body>
 </html>
