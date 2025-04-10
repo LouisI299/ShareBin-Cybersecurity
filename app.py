@@ -161,9 +161,19 @@ def edit_note(note_id):
 def list_notes():
     conn = get_db()
     c = conn.cursor()
-    c.execute(f"SELECT * FROM notes WHERE is_private = 0")
-    notes = c.fetchall()
-    conn.close()
+    notes = []
+    
+    if request.method == 'GET':
+        if 'search' in request.args:
+            search_query = request.args['q']
+            c.execute(f"SELECT * FROM notes WHERE title LIKE '%{search_query}%' AND is_private = 0")
+            notes = c.fetchall()
+            conn.close()
+            return render_template('list_notes.html', notes=notes, search_query=search_query)
+        else :
+            c.execute(f"SELECT * FROM notes WHERE is_private = 0")
+            notes = c.fetchall()
+            conn.close()
 
     return render_template('list_notes.html', notes=notes)
 
