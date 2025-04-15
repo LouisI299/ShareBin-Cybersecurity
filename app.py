@@ -1,11 +1,16 @@
 from flask import Flask, request, redirect, render_template, session, url_for, flash
 import sqlite3
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
 DATABASE = "database.db"
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'mp4', 'avi', 'mov', 'mkv', 'mp3', 'wav', 'ogg', 'pdf', 'doc', 'docx', 'txt' }
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -27,11 +32,15 @@ def init_db():
             user TEXT,
             title TEXT,
             content TEXT,
-            is_private INTEGER
+            is_private INTEGER,
+            file_path TEXT
         )
     ''')
     conn.commit()
     conn.close()
+    
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -41,8 +50,14 @@ def index():
     if user:
         conn = get_db()
         c = conn.cursor()
-        c.execute(f"SELECT * FROM notes WHERE user = '{user}'")
-        notes = c.fetchall()
+        c.execute(f"SELECT * FROM users WHERE username = '{user}'")
+        valid_user = c.fetchone()
+        if not valid_user:
+            session.pop('username', None)  # Clear invalid session
+            user = None
+        else:
+            c.execute(f"SELECT * FROM notes WHERE user = '{user}'")
+            notes = c.fetchall()
         conn.close()
     return render_template('index.html', user=user, notes=notes)
 
@@ -90,13 +105,17 @@ def create_note():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
+        file = request.files.get('file')
         is_private = int('private' in request.form)
-
+        filename = None
+        if file and file.filename != '':
+            filename = file.filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         conn = get_db()
         c = conn.cursor()
         c.execute(f'''
-            INSERT INTO notes (user, title, content, is_private)
-            VALUES ('{session["username"]}', '{title}', '{content}', {is_private})
+            INSERT INTO notes (user, title, content, is_private, file_path)
+            VALUES ('{session["username"]}', '{title}', '{content}', {is_private}, '{filename}')
         ''')
         conn.commit()
         conn.close()

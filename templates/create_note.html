@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
   <h2 class="text-2xl font-bold mb-4">New Note</h2>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <label class="block mb-2">Title:</label>
     <input
       type="text"
@@ -17,6 +17,9 @@
       class="w-full border p-2 rounded mb-4"
       required
     ></textarea>
+
+    <label class="block text-sm font-medium">Attach a file</label>
+    <input type="file" name="file" class="w-full border p-2 rounded" />
 
     <label class="inline-flex items-center mb-4">
       <input type="checkbox" name="private" class="mr-2" /> Private </label

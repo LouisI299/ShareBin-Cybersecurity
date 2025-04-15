@@ -1,6 +1,51 @@
 {% extends "base.html" %} {% block content %}
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
   <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+  {% if note[5] %}
+  <div class="mt-4">
+    <p class="font-semibold">Attached File:</p>
+    {% set file_extension = note[5].split('.')[-1].lower() %} {% if
+    file_extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
+    <img
+      src="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
+      alt="Attached Image"
+      class="mt-2 max-w-full h-auto rounded"
+    />
+    {% elif file_extension in ['mp4', 'avi', 'mov', 'mkv'] %}
+    <video
+      controls
+      class="mt-2 max-w-full h-auto rounded"
+      src="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
+    ></video>
+    {% elif file_extension in ['mp3', 'wav', 'ogg'] %}
+    <audio
+      controls
+      class="mt-2 max-w-full h-auto rounded"
+      src="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
+    ></audio>
+    {% elif file_extension in ['pdf', 'doc', 'docx', 'txt'] %}
+    <p class="mt-2">
+      <a
+        href="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
+        class="text-blue-500 underline"
+        target="_blank"
+        >{{ note[5] }}</a
+      >
+    </p>
+    {% else %}
+    <p class="mt-2">
+      Unsupported file type. You can download it
+      <a
+        href="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
+        class="text-blue-500 underline"
+        target="_blank"
+        >here</a
+      >
+    </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
   <div class="prose max-w-none">{{ note[3]|safe }}</div>
   {% if user == note[1] %}
