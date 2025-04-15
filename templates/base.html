@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ShareBin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "congress-blue": {
+                50: "#eff8ff",
+                100: "#deefff",
+                200: "#b6e1ff",
+                300: "#76c9ff",
+                400: "#2dafff",
+                500: "#0295f5",
+                600: "#0075d2",
+                700: "#005daa",
+                800: "#004b85",
+                900: "#074273",
+                950: "#042a4d",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <script
+      src="https://kit.fontawesome.com/6314ce27cc.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body class="font-[lato] text-congress-blue-950 bg-congress-blue-100">
+    <header>
+      <nav class="bg-congress-blue-500 p-4 flex flex-row w-full">
+        <div class="container justify-start text-2xl w-fit">
+          <a
+            href="/"
+            class="flex items-center hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+          >
+            <i class="fa-solid fa-box-archive pr-2"></i>
+            <h1 class="text-2xl">ShareBin</h1>
+          </a>
+        </div>
+        <div class="container justify-center text-2xl w-fit mx-auto">
+          <a
+            href="/notes"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >Notes</a
+          >
+          <a
+            href="/about"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >About</a
+          >
+          <a
+            href="/contact"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >Contact</a
+          >
+          {% if user == "admin" %}
+          <a
+            href="/admin"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >Admin</a
+          >
+          {% endif %}
+        </div>
+        <div class="container justify-end text-2xl w-fit">
+          {% if user %}
+          <a
+            href="/profile"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >{{ user }}</a
+          >
+          {% else %}
+          <a
+            href="/login"
+            class="p-2 hover:text-gray-200 transition-all duration-150 ease-in-out w-fit"
+            >Login</a
+          >
+
+          {% endif %}
+        </div>
+      </nav>
+    </header>
+    <section class="w-full h-screen">{% block content %}{% endblock %}</section>
+  </body>
+</html>

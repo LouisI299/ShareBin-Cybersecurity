@@ -36,6 +36,7 @@ def init_db():
 @app.route('/')
 def index():
     user = session.get('username')
+    notes = []
     
     if user:
         conn = get_db()
@@ -56,7 +57,7 @@ def register():
         conn.commit()
         conn.close()
         return redirect('/login')
-    return render_template('register.html')
+    return render_template('register.html', user=session.get('username'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -73,7 +74,7 @@ def login():
             return redirect('/')
         else:
             return 'Login failed.'
-    return render_template('login.html')
+    return render_template('login.html', user=session.get('username'))
 
 @app.route('/logout')
 def logout():
@@ -102,7 +103,7 @@ def create_note():
 
         return redirect('/')
 
-    return render_template('create_note.html')
+    return render_template('create_note.html', user=session.get('username'))
 
 @app.route('/note/<int:note_id>', methods=['GET', 'POST'])
 def view_note(note_id):
@@ -155,7 +156,7 @@ def edit_note(note_id):
 
         return redirect('/')
 
-    return render_template('edit_note.html', note=note)
+    return render_template('edit_note.html', note=note, user=session.get('username'))
 
 @app.route('/notes/')
 def list_notes():
@@ -175,7 +176,38 @@ def list_notes():
             notes = c.fetchall()
             conn.close()
 
-    return render_template('list_notes.html', notes=notes)
+    return render_template('list_notes.html', notes=notes, user=session.get('username'))
+
+@app.route('/profile/')
+def profile():
+    user = session.get('username')
+    if not user:
+        return redirect('/login')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(f"SELECT * FROM users WHERE username = '{user}'")
+    user = c.fetchone()
+    conn.close()
+
+    return render_template('profile.html', user=user)
+
+@app.route('/admin')
+def admin_dashboard():
+    if 'username' not in session:
+        return redirect('/login')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT * FROM users")
+    users = c.fetchall()
+
+    c.execute("SELECT * FROM notes")
+    notes = c.fetchall()
+
+    conn.close()
+
+    return render_template('admin.html', users=users, notes=notes, user=session.get('username'))
 
 
 if __name__ == '__main__':

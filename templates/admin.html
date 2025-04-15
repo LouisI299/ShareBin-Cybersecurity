@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block content %}
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow">
+  <h2 class="text-2xl font-bold mb-4">Admin Dashboard</h2>
+
+  <h3 class="text-lg font-semibold mt-4">All Users</h3>
+  <ul class="list-disc pl-6">
+    {% for user in users %}
+    <li>{{ user[1] }} (ID: {{ user[0] }})</li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="text-lg font-semibold mt-4">All Notes</h3>
+  <ul class="list-disc pl-6">
+    {% for note in notes %}
+    <li>
+      <a href="/notes/{{ note[0] }}" class="text-blue-600 hover:underline"
+        >{{ note[2] }}</a
+      >
+      — by {{ note[1] }}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

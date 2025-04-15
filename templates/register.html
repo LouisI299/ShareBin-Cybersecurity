@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Register</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <h2>Register</h2>
-    <form method="post">
-      Username: <input name="username" /><br />
-      Password: <input name="password" type="password" /><br />
-      <button type="submit">Register</button>
-    </form>
-    <a href="/">Back</a>
-  </body>
-</html>
+{% extends "base.html" %} {% block content %}
+<h2>Register</h2>
+<form method="post">
+  Username: <input name="username" /><br />
+  Password: <input name="password" type="password" /><br />
+  <button type="submit">Register</button>
+</form>
+<a href="/">Back</a>
+{% endblock %}
