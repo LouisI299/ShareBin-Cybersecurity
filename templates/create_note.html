@@ -21,9 +21,11 @@
     <label class="block text-sm font-medium">Attach a file</label>
     <input type="file" name="file" class="w-full border p-2 rounded" />
 
-    <label class="inline-flex items-center mb-4">
-      <input type="checkbox" name="private" class="mr-2" /> Private </label
-    ><br />
+    <select name="visibility" id="visibility">
+      <option value="public">Public</option>
+      <option value="private">Private</option>
+      <option value="friends">Only Friends</option>
+    </select>
 
     <button
       type="submit"

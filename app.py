@@ -38,6 +38,7 @@ def init_db():
             title TEXT,
             content TEXT,
             is_private INTEGER,
+            visibility TEXT CHECK(visibility IN ('public', 'private', 'friends')),
             file_path TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -103,6 +104,7 @@ def login():
             if user:
                 session['username'] = username
                 session['user_id'] = user[0]
+                print(f"DEBUG: Logged in user ID: {user[0]}, username: {username}")
                 return redirect('/')
             else:
                 return 'Login failed.'
@@ -149,17 +151,27 @@ def create_note():
         title = request.form['title']
         content = request.form['content']
         file = request.files.get('file')
-        is_private = int('private' in request.form)
+        is_private = 0;
+        visibility = request.form.get('visibility', 'public')
+        if visibility == 'private' or visibility == 'friends':
+            is_private = 1
         filename = None
+        conn = get_db()
+        c = conn.cursor()
         if file and file.filename != '':
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        conn = get_db()
-        c = conn.cursor()
-        c.execute(f'''
-            INSERT INTO notes (user, title, content, is_private, file_path)
-            VALUES ('{session["username"]}', '{title}', '{content}', {is_private}, '{filename}')
-        ''')
+            c.execute(f'''
+                INSERT INTO notes (user, title, content, is_private, visibility,file_path)
+                VALUES ('{session["user_id"]}', '{title}', '{content}', {is_private}, '{visibility}', '{filename}')
+            ''')
+        else:
+            c.execute(f'''
+                INSERT INTO notes (user, title, content, is_private, visibility)
+                VALUES ('{session["user_id"]}', '{title}', '{content}', {is_private}, '{visibility}')
+            ''')
+       
+        
         conn.commit()
         conn.close()
 
@@ -224,28 +236,58 @@ def edit_note(note_id):
 def list_notes():
     conn = get_db()
     c = conn.cursor()
-    notes = []
-    mynotes = []
-    if 'username' in session:
-        user = session.get('username')
-        c.execute(f"SELECT * FROM notes WHERE user = '{user}'")
-        mynotes = c.fetchall()
-        
-        
 
-    if request.method == 'GET':
-        if 'search' in request.args:
-            search_query = request.args['q']
-            c.execute(f"SELECT * FROM notes WHERE title LIKE '%{search_query}%' AND is_private = 0")
-            notes = c.fetchall()
-            conn.close()
-            return render_template('list_notes.html', notes=notes, search_query=search_query)
-        else :
-            c.execute(f"SELECT * FROM notes WHERE is_private = 0")
-            notes = c.fetchall()
-            conn.close()
+    public_notes = []
+    my_notes = []
+    friend_notes = []
+    search_query = None
 
-    return render_template('list_notes.html', notes=notes, user=session.get('username'), mynotes=mynotes)
+    user_id = session.get('user_id')
+    username = session.get('username')
+
+    if user_id:
+        # Get my own notes
+        c.execute("SELECT * FROM notes WHERE user = ?", (user_id,))
+        my_notes = c.fetchall()
+
+        # Get friend IDs
+        c.execute("""
+            SELECT u.id FROM users u
+            JOIN friends f ON (
+                (f.user_id = ? AND f.friend_id = u.id)
+                OR (f.friend_id = ? AND f.user_id = u.id)
+            )
+            WHERE u.id != ?
+        """, (user_id, user_id, user_id))
+        friend_ids = [row[0] for row in c.fetchall()]
+
+        # Get friends' notes with visibility = 'friends'
+        if friend_ids:
+            placeholders = ','.join(['?'] * len(friend_ids))
+            query = f"""
+                SELECT * FROM notes
+                WHERE user IN ({placeholders})
+                AND visibility = 'friends'
+            """
+            c.execute(query, friend_ids)
+            friend_notes = c.fetchall()
+
+    # Public notes + Search
+    if 'search' in request.args:
+        search_query = request.args.get('search')
+        c.execute("SELECT * FROM notes WHERE title LIKE ? AND visibility = 'public'", (f'%{search_query}%',))
+        public_notes = c.fetchall()
+    else:
+        c.execute("SELECT * FROM notes WHERE visibility = 'public'")
+        public_notes = c.fetchall()
+
+    conn.close()
+    return render_template('list_notes.html',
+                           notes=public_notes,
+                           mynotes=my_notes,
+                           friend_notes=friend_notes,
+                           search_query=search_query,
+                           user=username)
 
 @app.route('/profile/')
 def profile():
@@ -289,13 +331,27 @@ def contact():
 def send_friend_request(friend_id):
     requestor_id = session.get('user_id')
     receiver_id = friend_id
+    
+    print(f"DEBUG: Sending friend request from user ID {requestor_id} to user ID {receiver_id}")
+    
     if not requestor_id:
         return jsonify({"error": "User not logged in"}), 401
     conn = get_db()
     c = conn.cursor()
+    # Check if the requestor exists
+    c.execute("SELECT username FROM users WHERE id = ?", (requestor_id,))
+    requester = c.fetchone()
+    print(f"DEBUG: Requester: {requester}")
+    
+    # Check if the friend exists
+    c.execute("SELECT username FROM users WHERE id = ?", (friend_id,))
+    friend = c.fetchone()
+    print(f"DEBUG: Friend: {friend}")
+    
     c.execute(f"SELECT * FROM friend_requests WHERE sender_id = {requestor_id} AND receiver_id = {receiver_id}")
     existing_request = c.fetchone()
     if existing_request:
+        print(f"DEBUG: Friend request already exists: {existing_request}")
         return jsonify({"error": "Friend request already sent"}), 400
     c.execute(f'''
         INSERT INTO friend_requests (sender_id, receiver_id, status)
@@ -341,11 +397,22 @@ def social():
 
     conn = get_db()
     c = conn.cursor()
-    c.execute(f"SELECT * FROM friend_requests WHERE receiver_id = {session['user_id']} AND status = 'pending'")
+    c.execute("""
+        SELECT fr.id, u.username
+        FROM friend_requests fr
+        JOIN users u ON fr.sender_id = u.id
+        WHERE fr.receiver_id = ? AND fr.status = 'pending'
+    """, (session['user_id'],))
     pending_requests = c.fetchall()
 
-    c.execute(f"SELECT * FROM friends WHERE user_id = {session['user_id']}")
+    c.execute("""
+        SELECT u.username
+        FROM friends f
+        JOIN users u ON (f.user_id = u.id OR f.friend_id = u.id)
+        WHERE (f.user_id = ? OR f.friend_id = ?) AND u.id != ?
+    """, (session['user_id'], session['user_id'], session['user_id']))
     friends = c.fetchall()
+    
     
     if request.method == 'GET':
         if 'search' in request.args:

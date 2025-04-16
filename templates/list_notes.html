@@ -21,7 +21,7 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
     </form>
-    {% for note in notes %}
+    {% for note in public_notes %}
     <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
       <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
       <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
@@ -29,7 +29,7 @@
         >View Note</a
       >
     </div>
-    {% endfor %} {% if not notes %} {% if search_query %}
+    {% endfor %} {% if not public_notes %} {% if search_query %}
     <p class="text-center text-congress-blue-950/70">
       No notes found for "{{ search_query }}"
     </p>
@@ -37,6 +37,11 @@
     <p class="text-center text-gray-500">
       No notes available. Create a new note!
     </p>
+    <a
+      href="/note/new"
+      class="rounded-xl text-xl bg-congress-blue-300 py-4 px-8 mt-4 text-congress-blue-900 hover:bg-congress-blue-400"
+      >Create Note</a
+    >
     {% endif %} {% endif %}
   </section>
   <div class="w-[47%] flex flex-col justify-between items-center">
@@ -44,7 +49,7 @@
       class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-800/50 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
     >
       <h2 class="text-2xl font-bold mb-4">Your notes</h2>
-      {% for note in mynotes %}
+      {% for note in my_notes %}
       <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
         <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
         <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
@@ -52,7 +57,7 @@
           >View Note</a
         >
       </div>
-      {% endfor %} {% if not mynotes %} {% if user %}
+      {% endfor %} {% if not my_notes %} {% if user %}
       <p class="text-center text-congress-blue-50/70">
         No notes available. Create a new note!
       </p>
@@ -76,6 +81,24 @@
       class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-900/70 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
     >
       <h2 class="text-2xl font-bold mb-4">Friends' Notes</h2>
+      {% if friend_notes %} {% for note in friend_notes %}
+      <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
+        <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+        <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
+        <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+          >View Note</a
+        >
+      </div>
+      {% endfor %} {% else %}
+      <p class="text-center text-congress-blue-50/70">
+        No friends' notes available. Add friends to see their notes!
+      </p>
+      <a
+        href="/social"
+        class="rounded-xl text-xl bg-congress-blue-300 py-4 px-8 mt-4 text-congress-blue-900 hover:bg-congress-blue-400"
+        >Social</a
+      >
+      {% endif %}
     </section>
   </div>
 </div>

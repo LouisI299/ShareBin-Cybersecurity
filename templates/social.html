@@ -63,12 +63,25 @@
         >
           <h2 class="text-2xl font-bold mb-2">{{ request[1] }}</h2>
 
-          <form action="/accept-friend-request/{{ request[0] }}">
+          <form
+            action="/respond-friend-request/{{ request[0] }} "
+            method="post"
+          >
             <button
               type="submit"
+              name="action"
+              value="accept"
               class="bg-congress-blue-500 text-congress-blue-50 px-4 py-2 rounded hover:bg-congress-blue-600"
             >
               Accept
+            </button>
+            <button
+              name="action"
+              value="decline"
+              type="submit"
+              class="bg-congress-blue-500 text-congress-blue-50 px-4 py-2 rounded hover:bg-congress-blue-600"
+            >
+              Decline
             </button>
           </form>
         </div>
@@ -90,7 +103,7 @@
         <div
           class="max-w-xl mx-2 bg-congress-blue-100 p-6 rounded-xl shadow mb-4"
         >
-          <h2 class="text-2xl font-bold mb-2">{{ friend[1] }}</h2>
+          <h2 class="text-2xl font-bold mb-2">{{ friend[0] }}</h2>
         </div>
         {% endfor %}
       </div>

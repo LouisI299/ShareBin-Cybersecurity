@@ -3,6 +3,7 @@
   <h1 class="text-2xl font-bold mb-4">Profile</h1>
   {% if user_info %}
   <p class="text-lg mb-4">Welcome, {{ user_info[1] }}!</p>
+  <p class="text-lg mb-4">User ID: {{ user_info[0] }}</p>
   <a
     href="/logout"
     class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
