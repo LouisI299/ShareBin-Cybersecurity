@@ -1,32 +1,82 @@
 {% extends "base.html" %} {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
-  <form method="get" class="mb-4">
-    <input
-      type="text"
-      name="q"
-      placeholder="Search notes..."
-      value="{{ search_query }}"
-      class="w-full border p-2 rounded"
-    />
-    <button
-      type="submit"
-      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-2"
-    >
-      Search
-    </button>
-    <input type="hidden" name="search" value="{{ search_query }}" />
-  </form>
-</div>
-{% for note in notes %}
-<div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
-  <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-  <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
-  <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
-    >View Note</a
+
+<div class="flex flex-row w-full h-full max-h-full justify-around pb-2">
+  <section
+    class="w-[47%] h-auto max-h-full overflow-scroll bg-congress-blue-700/30 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4"
   >
+    <h2 class="text-2xl font-bold mb-4">All Public Notes</h2>
+    <form method="get" class="mb-4 flex flex-row justify-center items-center">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search notes..."
+        value="{{ search_query }}"
+        class="w-full border p-2 rounded-l"
+      />
+      <button
+        type="submit"
+        name="search"
+        class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+      >
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
+    {% for note in notes %}
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
+      <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+      <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
+      <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+        >View Note</a
+      >
+    </div>
+    {% endfor %} {% if not notes %} {% if search_query %}
+    <p class="text-center text-congress-blue-950/70">
+      No notes found for "{{ search_query }}"
+    </p>
+    {% else %}
+    <p class="text-center text-gray-500">
+      No notes available. Create a new note!
+    </p>
+    {% endif %} {% endif %}
+  </section>
+  <div class="w-[47%] flex flex-col justify-between items-center">
+    <section
+      class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-800/50 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
+    >
+      <h2 class="text-2xl font-bold mb-4">Your notes</h2>
+      {% for note in mynotes %}
+      <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
+        <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+        <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
+        <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+          >View Note</a
+        >
+      </div>
+      {% endfor %} {% if not mynotes %} {% if user %}
+      <p class="text-center text-congress-blue-50/70">
+        No notes available. Create a new note!
+      </p>
+      <a
+        href="/note/new"
+        class="rounded-xl text-xl bg-congress-blue-300 py-4 px-8 mt-4 text-congress-blue-900 hover:bg-congress-blue-400"
+        >Create Note</a
+      >
+      {% else %}
+      <p class="text-center text-congress-blue-50/70">
+        No notes available. Log in to see your notes!
+      </p>
+      <a
+        href="/note/new"
+        class="rounded-xl text-xl bg-congress-blue-300 py-4 px-8 mt-4 text-congress-blue-900 hover:bg-congress-blue-400"
+        >Sign In</a
+      >
+      {% endif %} {% endif %}
+    </section>
+    <section
+      class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-900/70 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
+    >
+      <h2 class="text-2xl font-bold mb-4">Friends' Notes</h2>
+    </section>
+  </div>
 </div>
-{% endfor %} {% if not notes %} {% if search_query %}
-<p class="text-center text-gray-500">No notes found for "{{ search_query }}"</p>
-{% else %}
-<p class="text-center text-gray-500">No notes available. Create a new note!</p>
-{% endif %} {% endif %} {% endblock %}
+{% endblock %}

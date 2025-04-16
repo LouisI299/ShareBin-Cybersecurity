@@ -1,0 +1,112 @@
+{% extends "base.html" %} {% block content %}
+<div
+  class="p-2 mx-2 bg-congress-blue-900 rounded-xl text-congress-blue-100 backdrop-blur-lg"
+>
+  <h1 class="text-semibold text-5xl">About ShareBin</h1>
+  <hr / />
+  <h2 class="text-2xl my-2">TL;DR:</h2>
+  <p class="text-lg mr-32">
+    ShareBin is a purposefully vulnerable web app built to demonstrate the OWASP
+    Top 10 and other web application vulnerabilities. It includes real-world
+    flaws like XSS, IDOR, SQL injection, and insecure file uploads. Think of it
+    as a playground for learning web security through practice.
+  </p>
+  <h2 class="text-2xl my-2">
+    Welcome to ShareBin, Your Go-To Platform for (insecure) File and Note
+    Sharing.
+  </h2>
+  <p class="text-lg mr-32">
+    Welcome to ShareBin — your go-to platform for (insecure) note and file
+    sharing. I'm Louis Ingelbrecht, a second-year Applied Informatics student,
+    and I created ShareBin as part of a Security Essentials project. The goal?
+    To build an intentionally vulnerable application that demonstrates the most
+    common — and dangerous — flaws found in real-world web apps. Whether you're
+    learning about cybersecurity or just curious how apps get hacked, ShareBin
+    offers a hands-on look at the risks. This platform is not secure — and
+    that's exactly the point.
+  </p>
+  <h2 class="text-2xl my-2">Why ShareBin Was Created:</h2>
+  <p class="text-lg mr-32">
+    For my Security Essentials assignment, I was tasked with analysing and
+    documenting the security requirements of an application of my choice. I
+    couldn't find a suitable application for this assignment, so I decided to
+    create my own. As an IT-student interested in the field of cybersecurity,
+    the goal was to create a web application that illustrates common
+    vulnerabilities, analyse these security threats and propose/implement
+    measures to mitigate these risks. ShareBin is intentionally built to
+    showcase how easily an insecure app can expose user data. By exploring this
+    project, I aim to highlight key security weaknesses in a way that’s
+    interactive and tangible. The purpose of ShareBin isn’t to promote unsafe
+    practices, but to demonstrate them and show just how easily attackers can
+    exploit poor coding, weak authentication, and lack of encryption. This
+    project is also a practical tool for anyone learning about cybersecurity to
+    better understand these risks and how to mitigate them in their own work.
+  </p>
+  <h2 class="text-2xl my-2">
+    Vulnerabilities Present in ShareBin (OWASP Top 10):
+  </h2>
+  <p class="text-lg mr-32">
+    I have drawn inspiration from the OWASP Top 10 vulnerabilities to create a
+    web application that is intentionally insecure. The following
+    vulnerabilities are present in ShareBin:
+  </p>
+  <ul class="list-disc ml-8">
+    <li>
+      <strong>A01 – Broken Access Control:</strong> Users can access files and
+      notes belonging to others by modifying URLs (IDOR).
+    </li>
+    <li>
+      <strong>A02 – Cryptographic Failures:</strong> No encryption on files or
+      data in transit. Session cookies are also unencrypted.
+    </li>
+    <li>
+      <strong>A03 – Injection:</strong> SQL Injection is possible through the
+      search functionality.
+    </li>
+    <li>
+      <strong>A05 – Security Misconfiguration:</strong> Debug mode enabled,
+      overly permissive CORS headers, and no security headers.
+    </li>
+    <li>
+      <strong>A07 – Identification and Authentication Failures:</strong> Weak
+      login, no rate limiting, no MFA, poor session handling.
+    </li>
+    <li>
+      <strong>A08 – Software and Data Integrity Failures:</strong> Users can
+      upload and store potentially dangerous files unchecked.
+    </li>
+    <li>
+      <strong>A09 – Security Logging and Monitoring Failures:</strong> No logs
+      or alerts for suspicious behavior like failed logins or access attempts.
+    </li>
+  </ul>
+  <p class="text-lg mr-32">
+    By exploring these vulnerabilities, users can understand how easy it is for
+    an attacker to compromise a web application.
+  </p>
+  <p class="text-lg mr-32 my-1">
+    <strong>Challenge: </strong>Can you find a vulnerability that isn't listed
+    here? Try abusing a feature, escalating privileges, or exfiltrating data. If
+    you find a creative exploit — congrats, you just hacked ShareBin.
+  </p>
+  <h2 class="text-2xl my-2">A Note from the Developer:</h2>
+  <p class="text-lg mr-32">
+    While ShareBin is an intentionally insecure app, its purpose is to serve as
+    an educational tool. If you’re exploring this project as part of a
+    cybersecurity course or self-study, I encourage you to break the app's
+    defences, find any vulnerabilities I haven't mentioned and reflect on each
+    security risk. The vulnerabilities I’ve built into ShareBin are real risks
+    that often appear in web apps, and understanding them is key to developing
+    more secure systems.
+  </p>
+  <h2 class="text-2xl my-2">
+    <i class="fa-solid fa-triangle-exclamation"></i> Disclaimer:
+  </h2>
+  <p class="text-lg mr-32">
+    ShareBin is not meant to be deployed in production or used to share real
+    files. It is intentionally insecure and designed solely for learning and
+    experimentation.
+  </p>
+</div>
+
+{% endblock %}

@@ -38,7 +38,28 @@ def init_db():
             title TEXT,
             content TEXT,
             is_private INTEGER,
-            file_path TEXT
+            file_path TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS friend_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER,
+            receiver_id INTEGER,
+            status TEXT CHECK(status IN ('pending', 'accepted', 'declined')),
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(sender_id) REFERENCES users(id),
+            FOREIGN KEY(receiver_id) REFERENCES users(id)
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS friends (
+            user_id INTEGER,
+            friend_id INTEGER,
+            UNIQUE(user_id, friend_id),
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(friend_id) REFERENCES users(id)
         )
     ''')
     conn.commit()
@@ -81,6 +102,7 @@ def login():
             conn.close()
             if user:
                 session['username'] = username
+                session['user_id'] = user[0]
                 return redirect('/')
             else:
                 return 'Login failed.'
@@ -203,7 +225,14 @@ def list_notes():
     conn = get_db()
     c = conn.cursor()
     notes = []
-    
+    mynotes = []
+    if 'username' in session:
+        user = session.get('username')
+        c.execute(f"SELECT * FROM notes WHERE user = '{user}'")
+        mynotes = c.fetchall()
+        
+        
+
     if request.method == 'GET':
         if 'search' in request.args:
             search_query = request.args['q']
@@ -216,7 +245,7 @@ def list_notes():
             notes = c.fetchall()
             conn.close()
 
-    return render_template('list_notes.html', notes=notes, user=session.get('username'))
+    return render_template('list_notes.html', notes=notes, user=session.get('username'), mynotes=mynotes)
 
 @app.route('/profile/')
 def profile():
@@ -249,29 +278,90 @@ def admin_dashboard():
 
     return render_template('admin.html', users=users, notes=notes, user=session.get('username'))
 
-@app.route('/preview')
-def preview_url():
-    url = request.args.get("url")
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
+@app.route('/about')
+def about():
+    return render_template('about.html', user=session.get('username'))
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', user=session.get('username'))
 
-    try:
-        response = requests.get(url, timeout=3)
-        html = response.text
-        start = html.find("<title>")
-        end = html.find("</title>")
+@app.route("/friend-request/<int:friend_id>", methods=["POST"])
+def send_friend_request(friend_id):
+    requestor_id = session.get('user_id')
+    receiver_id = friend_id
+    if not requestor_id:
+        return jsonify({"error": "User not logged in"}), 401
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(f"SELECT * FROM friend_requests WHERE sender_id = {requestor_id} AND receiver_id = {receiver_id}")
+    existing_request = c.fetchone()
+    if existing_request:
+        return jsonify({"error": "Friend request already sent"}), 400
+    c.execute(f'''
+        INSERT INTO friend_requests (sender_id, receiver_id, status)
+        VALUES ({requestor_id}, {friend_id}, 'pending')
+    ''')
+    conn.commit()
+    conn.close()
+    return redirect('/social')
 
-        if start != -1 and end != -1:
-            title = html[start + 7:end].strip()
-        else:
-            title = "No title found"
+@app.route("/respond-friend-request/<int:request_id>", methods=["POST"])
+def respond_friend_request(request_id):
+    action = request.form.get('action')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(f"SELECT * FROM friend_requests WHERE id = {request_id}")
+    request_data = c.fetchone()
+    if not request_data:
+        return jsonify({"error": "Friend request not found"}), 404
+    if action == 'accept':
+        c.execute(f'''
+            UPDATE friend_requests
+            SET status = 'accepted'
+            WHERE id = {request_id}
+        ''')
+        c.execute(f'''
+            INSERT INTO friends (user_id, friend_id)
+            VALUES ({request_data[1]}, {request_data[2]})
+        ''')
+    elif action == 'decline':
+        c.execute(f'''
+            UPDATE friend_requests
+            SET status = 'declined'
+            WHERE id = {request_id}
+        ''')
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Friend request responded to"}), 200
 
-        return jsonify({
-            "url": url,
-            "title": title
-        })
-    except Exception as e:
-        return jsonify({"error": f"Failed to fetch URL: {str(e)}"}), 500
+@app.route("/social", methods=["GET"])
+def social():
+    if 'username' not in session:
+        return redirect('/login')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(f"SELECT * FROM friend_requests WHERE receiver_id = {session['user_id']} AND status = 'pending'")
+    pending_requests = c.fetchall()
+
+    c.execute(f"SELECT * FROM friends WHERE user_id = {session['user_id']}")
+    friends = c.fetchall()
+    
+    if request.method == 'GET':
+        if 'search' in request.args:
+            search_query = request.args['q']
+            c.execute(f"SELECT * FROM users WHERE username LIKE '%{search_query}%'")
+            users = c.fetchall()
+            conn.close()
+            return render_template('social.html', pending_requests=pending_requests, friends=friends, users=users, search_query=search_query, user=session.get('username'))
+        
+
+    conn.close()
+
+    return render_template('social.html', pending_requests=pending_requests, friends=friends, user=session.get('username'))
+
+
+    
 
 
 if __name__ == '__main__':

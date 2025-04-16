@@ -1,0 +1,103 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="w-full h-full flex flex-col">
+  <section
+    class="w-full h-[49%] bg-congress-blue-700/30 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
+  >
+    <h2 class="text-2xl font-bold mb-4">Search Users</h2>
+    <form method="get" class="mb-4 flex flex-row justify-center items-center">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search users..."
+        value="{{ search_query }}"
+        class="w-full border p-2 rounded-l"
+      />
+      <button
+        type="submit"
+        name="search"
+        class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+      >
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
+    {% if search_query %}
+    <div class="flex flex-row justify-center items-center">
+      {% for user in users %}
+      <div
+        class="max-w-xl mx-2 bg-congress-blue-100 p-6 rounded-xl shadow mb-4"
+      >
+        <h2 class="text-2xl font-bold mb-2">{{ user[1] }}</h2>
+
+        <form action="/friend-request/{{ user[0] }}" method="post">
+          <button
+            type="submit"
+            class="bg-congress-blue-500 text-congress-blue-50 px-4 py-2 rounded hover:bg-congress-blue-600"
+          >
+            Send Friend Request
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% if not users %}
+    <p class="text-center text-congress-blue-950/70">
+      No users found for "{{ search_query }}"
+    </p>
+    {% endif %} {% else %}
+    <p class="text-center text-congress-blue-950/70">
+      Enter a username to search for users.
+    </p>
+    {% endif %}
+  </section>
+  <div class="w-full flex flex-row h-[49%] justify-around items-center mt-2">
+    <section
+      class="w-[48%] h-full bg-congress-blue-700/30 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
+    >
+      <h2 class="text-2xl font-bold mb-4">Friend Requests</h2>
+      {% if pending_requests %}
+      <div class="flex flex-row justify-center items-center">
+        {% for request in pending_requests %}
+        <div
+          class="max-w-xl mx-2 bg-congress-blue-100 p-6 rounded-xl shadow mb-4"
+        >
+          <h2 class="text-2xl font-bold mb-2">{{ request[1] }}</h2>
+
+          <form action="/accept-friend-request/{{ request[0] }}">
+            <button
+              type="submit"
+              class="bg-congress-blue-500 text-congress-blue-50 px-4 py-2 rounded hover:bg-congress-blue-600"
+            >
+              Accept
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-center text-congress-blue-950/70">
+        No friend requests available.
+      </p>
+      {% endif %}
+    </section>
+    <section
+      class="w-[48%] h-full bg-congress-blue-700/30 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
+    >
+      <h2 class="text-2xl font-bold mb-4">Friends</h2>
+      {% if friends %}
+      <div class="flex flex-row justify-center items-center">
+        {% for friend in friends %}
+        <div
+          class="max-w-xl mx-2 bg-congress-blue-100 p-6 rounded-xl shadow mb-4"
+        >
+          <h2 class="text-2xl font-bold mb-2">{{ friend[1] }}</h2>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-center text-congress-blue-950/70">No friends available.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
