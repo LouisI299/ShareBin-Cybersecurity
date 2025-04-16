@@ -1,26 +1,129 @@
 {% extends "base.html" %} {% block content %}
-<section
-  class="w-3/4 h-3/4 bg-congress-blue-300 flex flex-col items-center justify-center border-4 border-congress-blue-800 rounded-lg p-4 mx-auto mt-10"
+
+<div
+  class="relative isolate px-6 text-center pt-36 flex flex-col items-center h-[90vh]"
 >
-  <p class="text-5xl">
-    Welcome to <i class="fa-solid fa-box-archive"></i>ShareBin!
-  </p>
-  <p class="text-2xl">
-    The most unsecure storage and sharing platform for your notes, files and
-    pictures.
-  </p>
-</section>
-{% if user %}
-<a href="/note/new" class="text-blue-500 hover:underline">Create New Note</a>
-{% if notes %} {% for note in notes %}
-<div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
-  <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-  <p class="text-sm mb-4">By {{ note[1] }}</p>
-  <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
-    >View Note</a
+  <h1 class="text-6xl font-semibold text-shadow-md">Welcome to ShareBin</h1>
+  <h2 class="text-2xl mt-2 text-congress-blue-950/70">
+    The most insecure platform for storing and sharing notes and files.
+  </h2>
+  <div class="mt-8 w-1/3 flex flex-row justify-between items-center">
+    {% if user %}
+    <a
+      href="/note/new"
+      class="bg-congress-blue-800 text-congress-blue-200 text-1xl px-8 py-2 rounded-full hover:bg-congress-blue-900"
+      >Get Started</a
+    >
+    {% else %}
+    <a
+      href="/login"
+      class="bg-congress-blue-800 text-congress-blue-200 text-xl px-8 py-2 rounded-full hover:bg-congress-blue-900"
+      >Get Started</a
+    >
+    {% endif %}
+    <a href="/about" class="text-xl hover:text-congress-blue-700">
+      Learn more <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+  <a
+    id="examples"
+    href="#examples"
+    class="flex flex-col items-center hover:text-congress-blue-700 animate-bounce absolute bottom-0 inset-x-0"
   >
+    <span class="mb-1 text-lg">See how it works</span>
+    <svg
+      class="w-6 h-6"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  </a>
 </div>
 
-{% endfor %} {% else %}
-<p class="text-center text-gray-500">No notes available. Create a new note!</p>
-{% endif %} {% endif %} {% endblock %}
+<div class="flex flex-row justify-around w-full">
+  <section
+    class="w-[47%] ml-2 flex-col bg-congress-blue-100/30 rounded-lg shadow-lg backdrop-blur-lg"
+  >
+    <h2 class="text-center text-3xl my-4 font-semibold">Popular Notes</h2>
+
+    <div
+      class="bg-congress-blue-100 mx-auto w-5/6 rounded-xl shadow p-5 my-2 hover:shadow-lg transition"
+    >
+      <h3 class="font-bold text-lg text-blue-800">
+        Math Cheatsheet - Derivatives
+      </h3>
+      <p class="text-gray-600 mt-2 text-sm">f(x) = xⁿ → f'(x) = n·xⁿ⁻¹...</p>
+      <p class="text-xs text-gray-400 mt-4">by user23</p>
+    </div>
+    <div
+      class="bg-congress-blue-100 mx-auto w-5/6 rounded-xl shadow p-5 my-2 hover:shadow-lg transition"
+    >
+      <h3 class="font-bold text-lg text-blue-800">Shopping List - Groceries</h3>
+      <p class="text-gray-600 mt-2 text-sm">
+        Eggs, soap, pancakes, milk, bread and butter...
+      </p>
+      <p class="text-xs text-gray-400 mt-4">by jennifer1994</p>
+    </div>
+    <div
+      class="bg-congress-blue-100 mx-auto w-5/6 rounded-xl shadow p-5 my-2 hover:shadow-lg transition"
+    >
+      <h3 class="font-bold text-lg text-blue-800">Picture of my dog</h3>
+      <p class="text-gray-600 mt-2 text-sm">Isn't he cute?</p>
+      <img
+        src="/static/uploads/dog.jpg"
+        alt="dog"
+        class="mt-2 rounded-lg size-32 border-1 shadow-lg"
+      />
+      <p class="text-xs text-gray-400 mt-4">by unclehank</p>
+    </div>
+  </section>
+  <section
+    class="w-[47%] mr-2 flex-col bg-congress-blue-100/30 rounded-lg shadow-lg backdrop-blur-lg"
+  >
+    <h2 class="text-center text-3xl my-4 font-semibold">What our users say</h2>
+    <div
+      class="bg-congress-blue-100 mx-auto shadow-md rounded-xl my-2 p-6 w-5/6"
+    >
+      <p class="italic text-congress-blue-950">
+        "I love ShareBin! It's the perfect place to store all my notes and
+        files."
+      </p>
+      <p class="mt-4 text-sm font-semibold text-congress-blue-900">– Sam P.</p>
+    </div>
+    <div
+      class="bg-congress-blue-100 mx-auto shadow-md my-2 rounded-xl p-6 w-5/6"
+    >
+      <p class="italic text-congress-blue-950">
+        "I uploaded my entire financial report to ShareBin and it was perfect
+        for my needs!"
+      </p>
+      <p class="mt-4 text-sm font-semibold text-congress-blue-900">– Eric M.</p>
+    </div>
+    <div
+      class="bg-congress-blue-100 mx-auto shadow-md my-2 rounded-xl p-6 w-5/6"
+    >
+      <p class="italic text-congress-blue-950">
+        "ShareBin has made group projects so much easier. We just drop our notes
+        in and share the link."
+      </p>
+      <p class="mt-4 text-sm font-semibold text-congress-blue-900">– Maya D.</p>
+    </div>
+    <div
+      class="bg-congress-blue-100 mx-auto shadow-md my-2 rounded-xl p-6 w-5/6"
+    >
+      <p class="italic text-congress-blue-950">
+        "We switched to ShareBin for internal team notes. It’s blazing fast and
+        zero setup. Just... don’t put anything you care about too much on
+        there."
+      </p>
+      <p class="mt-4 text-sm font-semibold text-congress-blue-900">
+        – Hasan A.
+      </p>
+    </div>
+  </section>
+</div>
+
+{% endblock %}
