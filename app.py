@@ -1,7 +1,10 @@
-from flask import Flask, request, redirect, render_template, session, url_for, flash
+from flask import Flask, request, redirect, render_template, session, url_for, flash, jsonify, send_from_directory
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
+import requests
+
+
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -23,7 +26,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
-            password TEXT
+            password TEXT,
+            email TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     c.execute('''
@@ -61,34 +66,50 @@ def index():
         conn.close()
     return render_template('index.html', user=user, notes=notes)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db()
-        c = conn.cursor()
-        c.execute(f"INSERT INTO users (username, password) VALUES ('{username}', '{password}')")
-        conn.commit()
-        conn.close()
-        return redirect('/login')
-    return render_template('register.html', user=session.get('username'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db()
-        c = conn.cursor()
-        c.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
-        user = c.fetchone()
-        conn.close()
-        if user:
+        if 'login' in request.form:
+            username = request.form['username']
+            password = request.form['password']
+            conn = get_db()
+            c = conn.cursor()
+            c.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
+            user = c.fetchone()
+            conn.close()
+            if user:
+                session['username'] = username
+                return redirect('/')
+            else:
+                return 'Login failed.'
+        elif 'register' in request.form:
+            email = request.form['email']
+            username = request.form['username']
+            password = request.form['password']
+            conn = get_db()
+            c = conn.cursor()
+            c.execute(f"SELECT * FROM users WHERE username = '{username}'")
+            existing_user = c.fetchone()
+            if existing_user:
+                return 'Username already exists.'
+            c.execute(f"SELECT * FROM users WHERE email = '{email}'")
+            existing_email = c.fetchone()
+            if existing_email:
+                return 'Email already exists.'
+            if not username or not password:
+                return 'Username and password are required.'
+            if not email:
+                return 'Email is required.'
+            c.execute(f'''
+                INSERT INTO users (username, password, email)
+                VALUES ('{username}', '{password}', '{email}')
+            ''')
+            conn.commit()
+            conn.close()
             session['username'] = username
             return redirect('/')
-        else:
-            return 'Login failed.'
     return render_template('login.html', user=session.get('username'))
 
 @app.route('/logout')
@@ -206,10 +227,10 @@ def profile():
     conn = get_db()
     c = conn.cursor()
     c.execute(f"SELECT * FROM users WHERE username = '{user}'")
-    user = c.fetchone()
+    user_info = c.fetchone()
     conn.close()
 
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, user_info=user_info)
 
 @app.route('/admin')
 def admin_dashboard():
@@ -227,6 +248,30 @@ def admin_dashboard():
     conn.close()
 
     return render_template('admin.html', users=users, notes=notes, user=session.get('username'))
+
+@app.route('/preview')
+def preview_url():
+    url = request.args.get("url")
+    if not url:
+        return jsonify({"error": "No URL provided"}), 400
+
+    try:
+        response = requests.get(url, timeout=3)
+        html = response.text
+        start = html.find("<title>")
+        end = html.find("</title>")
+
+        if start != -1 and end != -1:
+            title = html[start + 7:end].strip()
+        else:
+            title = "No title found"
+
+        return jsonify({
+            "url": url,
+            "title": title
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch URL: {str(e)}"}), 500
 
 
 if __name__ == '__main__':

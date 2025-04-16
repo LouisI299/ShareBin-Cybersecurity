@@ -1,8 +1,8 @@
 {% extends "base.html" %} {% block content %}
 <div>
   <h1 class="text-2xl font-bold mb-4">Profile</h1>
-  {% if user %}
-  <p class="text-lg mb-4">Welcome, {{ user[1] }}!</p>
+  {% if user_info %}
+  <p class="text-lg mb-4">Welcome, {{ user_info[1] }}!</p>
   <a
     href="/logout"
     class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
