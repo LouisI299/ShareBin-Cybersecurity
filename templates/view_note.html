@@ -1,10 +1,10 @@
 {% extends "base.html" %} {% block content %}
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
   <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-  {% if note[5] %}
+  {% if note[6] %}
   <div class="mt-4">
     <p class="font-semibold">Attached File:</p>
-    {% set file_extension = note[5].split('.')[-1].lower() %} {% if
+    {% set file_extension = note[6].split('.')[-1].lower() %} {% if
     file_extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
     <img
       src="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
@@ -30,16 +30,6 @@
         class="text-blue-500 underline"
         target="_blank"
         >{{ note[5] }}</a
-      >
-    </p>
-    {% else %}
-    <p class="mt-2">
-      Unsupported file type. You can download it
-      <a
-        href="{{ url_for('static', filename='uploads/' ~ note[5]) }}"
-        class="text-blue-500 underline"
-        target="_blank"
-        >here</a
       >
     </p>
     {% endif %}

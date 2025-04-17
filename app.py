@@ -240,7 +240,7 @@ def list_notes():
     public_notes = []
     my_notes = []
     friend_notes = []
-    search_query = None
+    search_query = ""
 
     user_id = session.get('user_id')
     username = session.get('username')
@@ -272,19 +272,22 @@ def list_notes():
             c.execute(query, friend_ids)
             friend_notes = c.fetchall()
 
-    # Public notes + Search
-    if 'search' in request.args:
-        search_query = request.args.get('search')
-        c.execute("SELECT * FROM notes WHERE title LIKE ? AND visibility = 'public'", (f'%{search_query}%',))
-        public_notes = c.fetchall()
+    if request.method == 'GET':
+        if 'search' in request.args:
+            search_query = request.args.get('q')
+            c.execute("SELECT * FROM notes WHERE title LIKE ? AND visibility = 'public'", (f'%{search_query}%',))
+            public_notes = c.fetchall()
+        else:
+            c.execute("SELECT * FROM notes WHERE visibility = 'public'")
+            public_notes = c.fetchall()
     else:
         c.execute("SELECT * FROM notes WHERE visibility = 'public'")
         public_notes = c.fetchall()
 
     conn.close()
     return render_template('list_notes.html',
-                           notes=public_notes,
-                           mynotes=my_notes,
+                           public_notes=public_notes,
+                           my_notes=my_notes,
                            friend_notes=friend_notes,
                            search_query=search_query,
                            user=username)
