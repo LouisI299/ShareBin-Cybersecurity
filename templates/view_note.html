@@ -1,5 +1,8 @@
 {% extends "base.html" %} {% block content %}
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
+  <a href="/notes" class="text-blue-600 hover:underline mb-2 inline-block"
+    >← Back</a
+  >
   <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
   {% if note[6] %}
   <div class="mt-4">
@@ -36,25 +39,27 @@
   </div>
   {% endif %}
 
-  <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
+  <p class="text-sm text-gray-500 mb-4">By {{ note[8] }}</p>
   <div class="prose max-w-none">{{ note[3]|safe }}</div>
-  {% if user == note[1] %}
-  <form method="post" class="mt-4">
-    <button
-      type="submit"
-      name="delete"
-      class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+  {% if user == note[8] %}
+  <div class="mt-4 flex flex-row justify-between">
+    <a
+      href="/note/{{ note[0] }}/edit"
+      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 inline-block"
+      >Edit Note</a
     >
-      Delete Note
-    </button>
-  </form>
-  <a
-    href="/note/{{ note[0] }}/edit"
-    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 inline-block"
-    >Edit Note</a
-  >
+
+    <form method="post" class="mt-4">
+      <button
+        type="submit"
+        name="delete"
+        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
+        Delete Note
+      </button>
+    </form>
+  </div>
 
   {% endif %}
-  <a href="/" class="text-blue-600 hover:underline mt-4 inline-block">← Back</a>
 </div>
 {% endblock %}

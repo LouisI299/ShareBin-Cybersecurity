@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-2xl mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6">Contact Us</h1>
+
+  {% if request.args.get('submitted') %}
+  <div class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4">
+    Thank you for your message:
+    <strong>{{ request.args.get('message') }}</strong>
+  </div>
+  {% endif %}
+
+  <form action="/contact" method="POST" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1" for="name">Name</label>
+      <input
+        type="text"
+        name="name"
+        id="name"
+        required
+        class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        required
+        class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="message"
+        >Message</label
+      >
+      <textarea
+        name="message"
+        id="message"
+        rows="4"
+        required
+        class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
+      ></textarea>
+    </div>
+
+    <button
+      type="submit"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded"
+    >
+      Send Message
+    </button>
+  </form>
+</div>
+{% endblock %}

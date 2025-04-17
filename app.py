@@ -183,11 +183,18 @@ def create_note():
 def view_note(note_id):
     conn = get_db()
     c = conn.cursor()
-    c.execute(f"SELECT * FROM notes WHERE id = {note_id}")
+    c.execute("""
+        SELECT n.id, n.user, n.title, n.content, n.is_private, n.visibility, n.file_path, 
+               n.created_at, u.username 
+        FROM notes n
+        JOIN users u ON n.user = u.id
+        WHERE n.id = ?
+    """, (note_id,))
     note = c.fetchone()
     conn.close()
     
     user = session.get('username')
+    user_id = session.get('user_id')
 
     if note is None:
         return "Note not found", 404
@@ -201,7 +208,7 @@ def view_note(note_id):
             conn.close()
             return redirect('/')
 
-    return render_template('view_note.html', note=note, user=user)
+    return render_template('view_note.html', note=note, user=user, user_id=user_id)
 
 @app.route('/note/<int:note_id>/edit', methods=['GET', 'POST'])
 def edit_note(note_id):
@@ -350,9 +357,7 @@ def admin_dashboard():
 @app.route('/about')
 def about():
     return render_template('about.html', user=session.get('username'))
-@app.route('/contact')
-def contact():
-    return render_template('contact.html', user=session.get('username'))
+
 
 @app.route("/friend-request/<int:friend_id>", methods=["POST"])
 def send_friend_request(friend_id):
@@ -453,6 +458,18 @@ def social():
     conn.close()
 
     return render_template('social.html', pending_requests=pending_requests, friends=friends, user=session.get('username'))
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        message = request.form['message']
+
+        
+        return redirect(f"/contact?submitted=1&message={message}")
+
+    return render_template('contact.html', user=session.get('username'))
 
 
     
