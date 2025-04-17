@@ -247,7 +247,12 @@ def list_notes():
 
     if user_id:
         # Get my own notes
-        c.execute("SELECT * FROM notes WHERE user = ?", (user_id,))
+        c.execute("""
+            SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path 
+            FROM notes n
+            JOIN users u ON n.user = u.id
+            WHERE n.user = ?
+        """, (user_id,))
         my_notes = c.fetchall()
 
         # Get friend IDs
@@ -265,9 +270,11 @@ def list_notes():
         if friend_ids:
             placeholders = ','.join(['?'] * len(friend_ids))
             query = f"""
-                SELECT * FROM notes
-                WHERE user IN ({placeholders})
-                AND visibility = 'friends'
+                SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path 
+                FROM notes n
+                JOIN users u ON n.user = u.id
+                WHERE n.user IN ({placeholders})
+                AND n.visibility = 'friends'
             """
             c.execute(query, friend_ids)
             friend_notes = c.fetchall()
@@ -275,13 +282,30 @@ def list_notes():
     if request.method == 'GET':
         if 'search' in request.args:
             search_query = request.args.get('q')
-            c.execute("SELECT * FROM notes WHERE title LIKE ? AND visibility = 'public'", (f'%{search_query}%',))
+            c.execute("""
+                SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path
+                FROM notes n
+                JOIN users u ON n.user = u.id
+                WHERE n.title LIKE ? AND n.visibility = 'public'
+            """, (f'%{search_query}%',))
             public_notes = c.fetchall()
         else:
-            c.execute("SELECT * FROM notes WHERE visibility = 'public'")
+            c.execute("""
+                SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path
+                FROM notes n
+                JOIN users u ON n.user = u.id
+                WHERE n.visibility = 'public'
+                AND n.user != ?
+            """, (user_id,))
             public_notes = c.fetchall()
     else:
-        c.execute("SELECT * FROM notes WHERE visibility = 'public'")
+        c.execute("""
+            SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path
+            FROM notes n
+            JOIN users u ON n.user = u.id
+            WHERE n.visibility = 'public'
+            AND n.user != ?
+        """, (user_id,))
         public_notes = c.fetchall()
 
     conn.close()

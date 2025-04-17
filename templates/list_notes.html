@@ -22,7 +22,7 @@
       </button>
     </form>
     {% for note in public_notes %}
-    <div class="w-2/3 mx-auto bg-congress-blue-50 p-6 rounded-xl shadow mb-4">
+    <div class="w-4/5 mx-auto bg-congress-blue-50 p-6 rounded-xl shadow mb-4">
       <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
       <p class="text-lg text-congress-blue-950 mb-2">{{ note[3] }}</p>
       <p class="text-sm text-congress-blue-950/50 mb-4">By {{ note[1] }}</p>
@@ -51,12 +51,27 @@
     <section
       class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-800/50 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
     >
-      <h2 class="text-2xl font-bold mb-4">Your notes</h2>
+      <div class="flex flex-row w-full justify-between items-center mb-4">
+        <a
+          href="/note/new"
+          class="bg-congress-blue-300 rounded-xl text-xl py-2 px-4 text-congress-blue-900 hover:bg-congress-blue-400"
+        >
+          <i class="fa-solid fa-plus"></i
+        ></a>
+        <h2 class="text-2xl font-bold flex-grow text-center">Your notes</h2>
+        <div class="w-10"></div>
+      </div>
+
       {% for note in my_notes %}
-      <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
-        <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-        <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
-        <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+      <div
+        class="w-4/5 mx-auto text-congress-blue-950 bg-congress-blue-50 p-6 rounded-xl shadow mb-4"
+      >
+        <h2 class="text-xl font-bold mb-2">{{ note[2] }}</h2>
+        <p class="text-md text-congress-blue-950 mb-2">{{ note[3] }}</p>
+        <p class="text-sm text-congress-blue-950/50 mb-4">By {{ note[1] }}</p>
+        <a
+          href="/note/{{ note[0] }}"
+          class="text-congress-blue-700 hover:underline text-sm"
           >View Note</a
         >
       </div>
@@ -83,12 +98,20 @@
     <section
       class="w-full h-[49%] text-congress-blue-50 bg-congress-blue-900/70 backdrop-blur-lg shadow-lg flex flex-col justify-start items-center rounded-lg p-4 overflow-scroll"
     >
-      <h2 class="text-2xl font-bold mb-4">Friends' Notes</h2>
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Friends' Notes</h2>
+      </div>
+
       {% if friend_notes %} {% for note in friend_notes %}
-      <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow mb-4">
-        <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-        <p class="text-sm text-gray-500 mb-4">By {{ note[1] }}</p>
-        <a href="/note/{{ note[0] }}" class="text-blue-600 hover:underline"
+      <div
+        class="w-4/5 mx-auto text-congress-blue-950 bg-congress-blue-50 p-6 rounded-xl shadow mb-4"
+      >
+        <h2 class="text-xl font-bold mb-2">{{ note[2] }}</h2>
+        <p class="text-md text-congress-blue-950 mb-2">{{ note[3] }}</p>
+        <p class="text-sm text-congress-blue-950/50 mb-4">By {{ note[1] }}</p>
+        <a
+          href="/note/{{ note[0] }}"
+          class="text-congress-blue-700 hover:underline text-sm"
           >View Note</a
         >
       </div>
