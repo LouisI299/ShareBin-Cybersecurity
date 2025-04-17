@@ -21,18 +21,23 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
     </form>
-    {% for note in public_notes %}
-    <div class="w-4/5 mx-auto bg-congress-blue-50 p-6 rounded-xl shadow mb-4">
-      <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
-      <p class="text-lg text-congress-blue-950 mb-2">{{ note[3] }}</p>
-      <p class="text-sm text-congress-blue-950/50 mb-4">By {{ note[1] }}</p>
-      <a
-        href="/note/{{ note[0] }}"
-        class="text-congress-blue-700 hover:underline"
-        >View Note</a
-      >
+    <div class="flex flex-col overflow-scroll w-full">
+      {% for note in public_notes %}
+
+      <div class="w-4/5 mx-auto bg-congress-blue-50 p-6 rounded-xl shadow mb-4">
+        <h2 class="text-2xl font-bold mb-2">{{ note[2] }}</h2>
+        <p class="text-lg text-congress-blue-950 mb-2">{{ note[3] }}</p>
+        <p class="text-sm text-congress-blue-950/50 mb-4">By {{ note[1] }}</p>
+        <a
+          href="/note/{{ note[0] }}"
+          class="text-congress-blue-700 hover:underline"
+          >View Note</a
+        >
+      </div>
+
+      {% endfor %}
     </div>
-    {% endfor %} {% if not public_notes %} {% if search_query %}
+    {% if not public_notes %} {% if search_query %}
     <p class="text-center text-congress-blue-950/70">
       No notes found for "{{ search_query }}"
     </p>

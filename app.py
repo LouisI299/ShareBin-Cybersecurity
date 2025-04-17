@@ -139,6 +139,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('user_id', None)
     return redirect('/')
 
 
@@ -289,12 +290,18 @@ def list_notes():
     if request.method == 'GET':
         if 'search' in request.args:
             search_query = request.args.get('q')
-            c.execute("""
+            # c.execute("""
+            #     SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path
+            #     FROM notes n
+            #     JOIN users u ON n.user = u.id
+            #     WHERE n.title LIKE ? AND n.visibility = 'public'
+            # """, (f'%{search_query}%',))
+            c.execute(f"""
                 SELECT n.id, u.username, n.title, n.content, n.is_private, n.file_path
                 FROM notes n
                 JOIN users u ON n.user = u.id
-                WHERE n.title LIKE ? AND n.visibility = 'public'
-            """, (f'%{search_query}%',))
+                WHERE n.title LIKE '%{search_query}%' AND n.visibility = 'public'
+            """)
             public_notes = c.fetchall()
         else:
             c.execute("""
